@@ -12,6 +12,8 @@ namespace c74::min {
 
     using t_max_inlet = void*;
 
+    using t_is_hot = std::variant<bool, std::function<bool()>>;
+
 
     // Represents any type of inlet.
     // Used internally to allow heterogenous containers of inlets.
@@ -20,8 +22,8 @@ namespace c74::min {
         friend void object_base::create_inlets();
 
     public:
-        inlet_base(object_base* an_owner, const std::string& a_description, const std::string& a_type = "")
-        : port { an_owner, a_description, a_type }
+        inlet_base(object_base* an_owner, const std::string& a_description, const std::string& a_type = "", const t_is_hot& is_hot = true)
+        : port { an_owner, a_description, a_type }, m_is_hot { is_hot }
         {}
 
         virtual ~inlet_base() {}
@@ -29,8 +31,18 @@ namespace c74::min {
         virtual bool has_attribute_mapping() const = 0;
         virtual attribute_base* attribute() const = 0;
 
+        bool display_as_hot() const {
+            if (std::holds_alternative<bool>(m_is_hot)) {
+                return std::get<bool>(m_is_hot);
+            } else {
+                return std::get<std::function<bool()>>(m_is_hot)();
+            }
+        }
+
     private:
         t_max_inlet m_instance { nullptr };
+
+        t_is_hot m_is_hot;
     };
 
 
@@ -47,9 +59,10 @@ namespace c74::min {
         /// @param	an_owner		The owning object for the inlet. Typically you will pass `this`.
         /// @param	a_description	Description of the inlet for documentation and UI assistance.
         /// @param	a_type			Optional string to create a type-checked inlet.
+        /// @param  display_as_hot  Optional bool or std::function<bool()> to determine whether the inlet should be displayed as hot or cold.
 
-        inlet(object_base* an_owner, const std::string& a_description, const std::string& a_type = "")
-        : inlet_base { an_owner, a_description, a_type } {
+        inlet(object_base* an_owner, const std::string& a_description, const std::string& a_type = "", const t_is_hot& display_as_hot = true)
+        : inlet_base { an_owner, a_description, a_type, display_as_hot } {
             m_owner->inlets().push_back(this);
         }
 

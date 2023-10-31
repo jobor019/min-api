@@ -94,6 +94,14 @@ namespace c74::min {
         }
     }
 
+    template<class min_class_type>
+    void wrapper_method_inletinfo(minwrap<min_class_type>* self, const void* b, const long a, char* t) {
+        if (!self->m_min_object.inlets().empty()) {
+            const auto& inlet = self->m_min_object.inlets()[a];
+            *t = static_cast<char>(!inlet->display_as_hot());
+        }
+    }
+
 
     // Return the pointer to 'self' ... that is to say the pointer to the instance of our Max class
     // In the Jitter case there is a version of this function that returns instead the instance of the Jitter class
@@ -693,6 +701,7 @@ namespace c74::min {
     template<class min_class_type>
     void wrap_as_max_external_finish(max::t_class* c, const min_class_type& instance) {
         max::class_addmethod(c, reinterpret_cast<max::method>(wrapper_method_assist<min_class_type>), "assist", max::A_CANT, 0);
+        max::class_addmethod(c, reinterpret_cast<max::method>(wrapper_method_inletinfo<min_class_type>), "inletinfo", max::A_CANT, 0);
 
         behavior_flags flags = behavior_flags::none;
         class_get_flags<min_class_type>(instance, flags);
