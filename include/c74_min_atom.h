@@ -156,6 +156,11 @@ class atom : public max::t_atom
         return static_cast<size_t>(atom_getlong(this));
     }
 
+    operator uint32_t() const
+    {
+        return static_cast<uint32_t>(atom_getlong(this));
+    }
+
     operator bool() const
     {
         return atom_getlong(this) != 0;
