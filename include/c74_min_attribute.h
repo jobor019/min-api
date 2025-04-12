@@ -126,6 +126,28 @@ class live_color
     }
 };
 
+
+/// Defines whether the attribute's value should be saved by the object when edited in the inspector,
+/// so that it does not appear in italics in the inspector.
+/// @ingroup attributes
+
+class saved
+{
+    bool m_saved;
+
+  public:
+    explicit saved(bool value)
+        : m_saved{ value }
+    {
+    }
+
+    operator bool() const
+    {
+        return m_saved;
+    }
+
+};
+
 // Represents any type of attribute.
 // Used internally to allow heterogenous containers of attributes for the Min class.
 /// @ingroup attributes
@@ -270,6 +292,15 @@ class attribute_base
         return m_live_color;
     }
 
+
+    /// Return whether the attribute should be saved by the object when edited in the inspector.
+    /// @return True if the attribute should be saved, false otherwise.
+
+    bool saved_on_inspector_edit() const
+    {
+        return m_saved;
+    }
+
     /// Touch the attribute to force an update and notification of its value to any listeners.
 
     void touch()
@@ -292,6 +323,7 @@ class attribute_base
     symbol m_category; // Max inspector category
     int m_order{ 0 }; // Max inspector ordering
     symbol m_live_color{ k_sym__empty };
+    bool m_saved{ false }; // if true, attribute is saved by the object (so it does not appear in italics in the inspector)
 
     // calculate the offset of the size member as required for array/vector attributes
 
@@ -442,6 +474,14 @@ class attribute : public attribute_base
     constexpr typename enable_if<is_same<argument_type, live_color>::value>::type assign_from_argument(const argument_type& arg) noexcept
     {
         m_live_color = static_cast<symbol>(arg);
+    }
+
+    // constructor utility: handle an argument defining an attribute's saved property
+
+    template <typename argument_type>
+    constexpr typename enable_if<is_same<argument_type, saved>::value>::type assign_from_argument(const argument_type& arg) noexcept
+    {
+        m_saved = static_cast<bool>(arg);
     }
 
     // constructor utility: empty argument handling (required for handling recursive variadic templates)

@@ -655,6 +655,10 @@ max::t_class* wrap_as_max_external_common(min_class_type& instance, const char* 
             }
         }
 
+        if (attr.saved_on_inspector_edit() && !instance.is_ui_class()) {
+            CLASS_ATTR_SAVE(c, attr_name.c_str(), 0);
+        }
+
         if (instance.is_ui_class()) {
             CLASS_ATTR_SAVE(c, attr_name.c_str(), 0);
 
