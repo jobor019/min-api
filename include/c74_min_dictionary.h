@@ -122,6 +122,53 @@ class dict
         return (*this)[skey];
     };
 
+    bool insert(const symbol key, const atom& value)
+    {
+        return insert(key, atom(value));
+    }
+
+    bool insert(const symbol key, atom&& value)
+    {
+        return max::dictionary_appendatom(m_instance, key, &value) == max::MAX_ERR_NONE;
+    }
+
+    bool insert(const symbol key, const atoms& values)
+    {
+        return insert(key, atoms(values));
+    }
+
+    bool insert(const symbol key, atoms&& values)
+    {
+        if (values.empty()) {
+            return max::dictionary_appendatoms(m_instance, key, 0, nullptr) == max::MAX_ERR_NONE;
+        }
+
+        // This is safe because:
+        // 1. std::vector guarantees contiguous storage
+        // 2. min::atom IS a max::t_atom and adds no additional data members
+        return max::dictionary_appendatoms(m_instance, key, static_cast<long>(values.size()), &values[0]) == max::MAX_ERR_NONE;
+    }
+
+    bool contains(symbol key) const
+    {
+        return max::dictionary_hasentry(m_instance, key);
+    }
+
+    std::optional<atom_reference> get(const symbol key) const {
+        if (!contains(key)) {
+            return std::nullopt;
+        }
+
+        long argc = 0;
+        max::t_atom* argv = nullptr;
+
+        if (auto err = max::dictionary_getatoms(m_instance, key, &argc, &argv); err == max::MAX_ERR_NONE) {
+            return atom_reference{argc, argv};
+        }
+
+        return std::nullopt;
+    }
+
     symbol name() const
     {
         return dictobj_namefromptr(m_instance);
