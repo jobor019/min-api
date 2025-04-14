@@ -20,7 +20,7 @@ endif ()
 
 include(${C74_MAX_SDK_DIR}/script/max-pretarget.cmake)
 
-set(C74_INCLUDES "${MAX_SDK_INCLUDES}" "${MAX_SDK_MSP_INCLUDES}" "${MAX_SDK_JIT_INCLUDES}" "${MAX_SDK_INCLUDES}/.." "${CMAKE_CURRENT_LIST_DIR}/../include")
+set(C74_INCLUDES "${MAX_SDK_INCLUDES}" "${MAX_SDK_MSP_INCLUDES}" "${MAX_SDK_JIT_INCLUDES}" "${MAX_SDK_INCLUDES}/.." "${CMAKE_CURRENT_LIST_DIR}/../include" "${CMAKE_CURRENT_LIST_DIR}/../include/magic_enum/include")
 file(GLOB_RECURSE C74_MIN_HEADERS ${CMAKE_CURRENT_LIST_DIR}/../include/*.h)
 
 add_definitions(-DC74_MIN_API)

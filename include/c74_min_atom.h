@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "c74_min_enum.h"
+
 namespace c74::min {
 
 class event;
@@ -562,7 +564,13 @@ template <class T, typename enable_if<std::is_enum<T>::value, int>::type = 0>
 T from_atoms(const atoms& as)
 {
     auto index = static_cast<long>(as[0]);
-    auto size = static_cast<long>(T::enum_count);
+    long size;
+
+    if constexpr (has_explicit_enum_count_v<T>) {
+        size = static_cast<long>(T::enum_count);
+    } else {
+        size = min::enum_count<T>();
+    }
 
     if (index < 0) {
         index = 0;

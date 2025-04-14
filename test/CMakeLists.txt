@@ -33,6 +33,7 @@ target_compile_definitions(min-tests PUBLIC -DMIN_TEST)
 
 target_include_directories(min-tests PUBLIC
 	"${C74_MIN_API_DIR}/include"
+	"${C74_MIN_API_DIR}/include/magic_enum/include"
 	"${C74_MIN_API_DIR}/max-sdk-base/c74support"
 	"${C74_MIN_API_DIR}/max-sdk-base/c74support/max-includes"
 	"${C74_MIN_API_DIR}/max-sdk-base/c74support/msp-includes"

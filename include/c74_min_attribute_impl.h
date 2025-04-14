@@ -52,6 +52,11 @@ attribute<T, threadsafety, limit_type, repetitions>::attribute(object_base* an_o
     }
 
     handle_arguments(args...);
+
+    if constexpr (std::is_enum_v<T>) {
+        if (m_enum_map.empty()) m_enum_map = default_enum_map<T>();
+    }
+
     copy_range();
 
     m_default = a_default_value;

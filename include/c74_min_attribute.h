@@ -8,6 +8,8 @@
 #include <sstream>
 #include <unordered_map>
 
+#include "c74_min_enum.h"
+
 namespace c74::min {
 
 /// @defgroup attributes Attributes
@@ -837,6 +839,29 @@ class attribute : public attribute_base
         else {
             m_value = from_atoms<T>(args);
         }
+    }
+
+    // Construct an `enum_map` of the enum values.
+    // This is called for enum attributes only if no explicit enum_map is provided in the attribute constructor
+
+    template<typename U = T, typename = std::enable_if_t<std::is_enum_v<U>>>
+    static enum_map default_enum_map()
+    {
+        enum_map names;
+        if constexpr (has_explicit_enum_count_v<U>) {
+            // add every enum value but `enum_count`
+            constexpr auto all_values = min::enum_values<U>();
+            for (std::size_t i = 0; i < all_values.size() - 1; ++i) {
+                names.emplace_back(min::enum_name(all_values[i]));
+            }
+
+        } else {
+            for (const auto& v : min::enum_values<U>()) {
+                names.emplace_back(min::enum_name(v));
+            }
+        }
+
+        return names;
     }
 };
 

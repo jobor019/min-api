@@ -7,3 +7,6 @@
 [submodule "max-sdk-base"]
 	path = max-sdk-base
 	url = https://github.com/Cycling74/max-sdk-base
+[submodule "include/magic_enum"]
+	path = include/magic_enum
+	url = git@github.com:Neargye/magic_enum.git
