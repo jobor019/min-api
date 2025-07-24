@@ -135,6 +135,16 @@ bool atom::operator==(const double value) const
     return atom_getfloat(this) == value;
 }
 
+// minGW doesn't support implicit conversion from scoped enums (`enum class`) to underlying type. Without this, definitions like
+// `attribute<MyScopedEnum>` will fail to compile if MyScopedEnum is a scoped enum.
+template<typename E, typename = std::enable_if_t<std::is_enum_v<E>>,
+         typename = std::enable_if_t<!std::is_convertible_v<E, std::underlying_type_t<E>>>>
+bool operator==(const atom& a, E e)
+{
+    using U = std::underlying_type_t<E>;
+    return a == static_cast<U>(e);
+}
+
 bool atom::operator==(const max::t_object* value) const
 {
     return atom_getobj(this) == value;
