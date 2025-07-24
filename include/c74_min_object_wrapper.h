@@ -80,11 +80,13 @@ template <class min_class_type>
 void wrapper_method_assist(minwrap<min_class_type>* self, const void* b, const long m, const long a, char* s)
 {
     if (m == 2) {
-        const auto& outlet = self->m_min_object.outlets()[a];
-        strncpy(s, outlet->description().c_str(), 256);
+        if (a < self->m_min_object.outlets().size()) {
+            const auto& outlet = self->m_min_object.outlets()[a];
+            strncpy(s, outlet->description().c_str(), 256);
+        }
     }
     else {
-        if (!self->m_min_object.inlets().empty()) {
+        if (!self->m_min_object.inlets().empty() && a < self->m_min_object.inlets().size()) {
             const auto& inlet = self->m_min_object.inlets()[a];
             strncpy(s, inlet->description().c_str(), 256);
         }
@@ -279,7 +281,7 @@ template <class min_class_type, class message_name_type>
 void wrapper_method_multitouch(max::t_object* o, max::t_object* a_patcherview, const max::t_mouseevent* an_event)
 {
     auto self = wrapper_find_self<min_class_type>(o);
-    auto name = message_name_type::name;
+    std::string name = message_name_type::name;
 
     if (name == "mt_mouseenter") {
         name = "mouseenter";
@@ -576,8 +578,41 @@ max::t_class* wrap_as_max_external_common(min_class_type& instance, const char* 
     // messages
 
     for (auto& a_message : instance.messages()) {
+        // clang-format off
         MIN_WRAPPER_ADDMETHOD(c, bang, zero, A_NOTHING)
-        else MIN_WRAPPER_ADDMETHOD(c, dblclick, zero, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, dspstate, int, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, okclose, zero, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, edclose, zero, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, loadbang, zero, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, anything, anything, A_GIMME) else MIN_WRAPPER_ADDMETHOD(c, int, int, A_LONG) else MIN_WRAPPER_ADDMETHOD(c, float, float, A_FLOAT) else MIN_WRAPPER_ADDMETHOD(c, getplaystate, getplaystate, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, dictionary, dictionary, A_SYM) else MIN_WRAPPER_ADDMETHOD(c, notify, notify, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, patchlineupdate, self_ptr_long_ptr_long_ptr_long, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, fileusage, ptr, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, paint, paint, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mouseenter, mouse, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mt_mouseenter, multitouch, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mouseleave, mouse, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mt_mouseleave, multitouch, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mousedown, mouse, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mt_mousedown, multitouch, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mouseup, mouse, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mt_mouseup, multitouch, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mousemove, mouse, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mt_mousemove, multitouch, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mousedrag, mouse, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mt_mousedrag, multitouch, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, oksize, oksize, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mousedragdelta, mouse, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, mousedoubleclick, mouse, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, focusgained, self_ptr, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, focuslost, self_ptr, A_CANT) else MIN_WRAPPER_ADDMETHOD(c, key, self_ptr_long_long_long, A_CANT) else if (static_cast<message_type>(*a_message.second) == message_type::ellipsis)
+        else MIN_WRAPPER_ADDMETHOD(c, dblclick, zero, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, dspstate, int, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, okclose, zero, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, edclose, zero, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, loadbang, zero, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, anything, anything, A_GIMME)
+        else MIN_WRAPPER_ADDMETHOD(c, int, int, A_LONG)
+        else MIN_WRAPPER_ADDMETHOD(c, float, float, A_FLOAT)
+        else MIN_WRAPPER_ADDMETHOD(c, getplaystate, getplaystate, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, dictionary, dictionary, A_SYM)
+        else MIN_WRAPPER_ADDMETHOD(c, notify, notify, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, patchlineupdate, self_ptr_long_ptr_long_ptr_long, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, fileusage, ptr, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, paint, paint, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mouseenter, mouse, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mt_mouseenter, multitouch, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mouseleave, mouse, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mt_mouseleave, multitouch, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mousedown, mouse, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mt_mousedown, multitouch, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mouseup, mouse, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mt_mouseup, multitouch, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mousemove, mouse, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mt_mousemove, multitouch, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mousedrag, mouse, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mt_mousedrag, multitouch, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, oksize, oksize, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mousedragdelta, mouse, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, mousedoubleclick, mouse, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, focusgained, self_ptr, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, focuslost, self_ptr, A_CANT)
+        else MIN_WRAPPER_ADDMETHOD(c, key, self_ptr_long_long_long, A_CANT)
+        else if (static_cast<message_type>(*a_message.second) == message_type::ellipsis)
             max::class_addmethod(c, reinterpret_cast<method>(wrapper_method_ellipsis<min_class_type>), a_message.first.c_str(), max::A_CANT, 0);
         else if (a_message.first == "dspsetup"); // skip -- handle it in operator classes
         else if (a_message.first == "maxclass_setup"); // for min class construction only, do not add for exposure to max
@@ -585,7 +620,7 @@ max::t_class* wrap_as_max_external_common(min_class_type& instance, const char* 
             max::class_addmethod(c, reinterpret_cast<max::method>(wrapper_method_savestate<min_class_type>), "appendtodictionary", max::A_CANT, 0);
         else if (a_message.first == "mousewheel")
             max::class_addmethod(c, reinterpret_cast<max::method>(wrapper_method_mousewheel<min_class_type, wrapper_message_name_mousewheel>), "mousewheel", max::A_CANT, 0);
-
+        // clang-format on
         else {
             if (a_message.second->type() == max::A_GIMMEBACK) {
                 max::class_addmethod(c, reinterpret_cast<method>(wrapper_method_generic_typed<min_class_type>),
@@ -652,6 +687,33 @@ max::t_class* wrap_as_max_external_common(min_class_type& instance, const char* 
             }
             else if (attr.datatype() == "long" && attr.editor_style() == style::enum_index) {
                 CLASS_ATTR_ENUMINDEX(c, attr_name.c_str(), 0, range_string.c_str());
+                // The range string for an enum attr contains each name surrounded by quotes, so we
+                // can count the number of elements in order to set the min/max attr attrs
+                size_t count = 0;
+                bool in_quotes = false;
+                std::string str = attr.range_string();
+                for (size_t i = 0; i < str.length(); ++i) {
+                    if (str[i] == '"') {
+                        if (!in_quotes) {
+                            count++;
+                        }
+                        in_quotes = !in_quotes;
+                    }
+                }
+                if (count > 0) {
+                    CLASS_ATTR_MIN(c, attr_name.c_str(), 0, "0");
+                    CLASS_ATTR_MAX(c, attr_name.c_str(), 0, std::to_string(count - 1).c_str());
+                }
+            }
+            else if (attr.datatype() == "float64" || attr.datatype() == "long") {
+                // istream_iterator splits using spaces by default
+                std::istringstream iss(range_string);
+                if (const std::vector tokens(std::istream_iterator<std::string>{ iss },
+                                             std::istream_iterator<std::string>());
+                    tokens.size() == 2) {
+                    CLASS_ATTR_MIN(c, attr_name.c_str(), 0, tokens[0].c_str());
+                    CLASS_ATTR_MAX(c, attr_name.c_str(), 0, tokens[1].c_str());
+                }
             }
         }
 
@@ -838,6 +900,16 @@ void wrap_as_max_external(const char* cppname, const char* cmaxname, void* resou
             }
             else if (attr.datatype() == "long" && attr.editor_style() == style::enum_index) {
                 CLASS_ATTR_ENUMINDEX(this_jit_class, attr_name.c_str(), 0, range_string.c_str());
+            }
+            else if (attr.datatype() == "float64" || attr.datatype() == "long") {
+                // istream_iterator splits using spaces by default
+                std::istringstream iss(range_string);
+                if (const std::vector tokens(std::istream_iterator<std::string>{ iss },
+                                             std::istream_iterator<std::string>());
+                    tokens.size() == 2) {
+                    CLASS_ATTR_MIN(this_jit_class, attr_name.c_str(), 0, tokens[0].c_str());
+                    CLASS_ATTR_MAX(this_jit_class, attr_name.c_str(), 0, tokens[1].c_str());
+                }
             }
         }
     }

@@ -183,6 +183,7 @@ class attribute_base
     // All attributes must define what happens when you get their value.
 
     virtual operator atoms() const = 0;
+    virtual atoms get_atoms() const = 0;
 
     // All attributes must define what happens when asked for their range of values.
     // The range must be in string format, values separated by spaces.
@@ -237,6 +238,12 @@ class attribute_base
     visibility visible() const
     {
         return m_visibility;
+    }
+
+    /// Set the attribute's visibility
+    void set_visibility(const visibility v)
+    {
+        m_visibility = v;
     }
 
     /// Fetch the title/label as a string.
@@ -691,7 +698,7 @@ class attribute : public attribute_base
     /// Get the attribute value as a vector of atoms.
     /// @return The value of the attribute
 
-    atoms get_atoms() const
+    atoms get_atoms() const override
     {
         if (m_getter) {
             return m_getter();
