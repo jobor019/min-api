@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <variant>
+
 namespace c74::min {
 
 // Type definition for what the legacy C Max SDK uses to represent an inlet.
