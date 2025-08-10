@@ -31,6 +31,9 @@ attribute<T, threadsafety, limit_type, repetitions>::attribute(object_base* an_o
     else if (is_same<T, float>::value) {
         m_datatype = k_sym_float32;
     }
+    else if (is_same<T, atom>::value || is_same<T, atoms>::value) {
+        m_datatype = k_sym_atom;
+    }
     else {
         m_datatype = k_sym_float64;
     }
@@ -144,8 +147,36 @@ void attribute<numbers>::create(max::t_class* c, const max::method getter, const
     }
 };
 
+// TODO: Remove redundant code duplication: attribute<numbers>, attribute<ints> and attribute<atoms> overrides are identical
+
 template <>
 void attribute<ints>::create(max::t_class* c, const max::method getter, const max::method setter, bool const isjitclass)
+{
+    long attr_flags{};
+    if (visible() == visibility::hide) {
+        attr_flags |= max::ATTR_SET_OPAQUE_USER;
+    }
+
+    if (isjitclass) {
+        auto jit_attr = (max::t_jit_object*)max::object_new_imp(max::gensym("jitter"), max::gensym("jit_attr_offset_array"),
+                                                                const_cast<void*>(static_cast<const void*>(m_name.c_str())), static_cast<max::t_symbol*>(datatype()),
+                                                                reinterpret_cast<void*>(0xFFFF), reinterpret_cast<void*>(flags(isjitclass)), reinterpret_cast<void*>(getter),
+                                                                reinterpret_cast<void*>(setter), reinterpret_cast<void*>(size_offset()), nullptr);
+        max::jit_class_addattr(c, jit_attr);
+    }
+    else {
+        auto max_attr = max::attr_offset_array_new(
+            m_name, datatype(), 0xFFFF, static_cast<long>(flags(isjitclass)) | attr_flags, getter, setter, static_cast<long>(size_offset()), 0);
+        max::class_addattr(c, max_attr);
+    }
+
+    if (visible() == visibility::hide) {
+        class_attr_addattr_parse(c, m_name.c_str(), "invisible", c74::max::gensym("long"), 1, "1");
+    }
+};
+
+template <>
+void attribute<atoms>::create(max::t_class* c, const max::method getter, const max::method setter, bool const isjitclass)
 {
     long attr_flags{};
     if (visible() == visibility::hide) {
@@ -256,6 +287,14 @@ std::string attribute<ints>::range_string() const
     return ss.str();
 };
 
+template <>
+std::string attribute<atoms>::range_string() const
+{
+    // TODO: with full C++17 support and constexpr usage, a static_assert would be preferable here
+    assert(m_range.empty()); // a mixed type cannot have a range
+    return "";
+}
+
 // enum attrs use the special enum map for range
 template <typename T, threadsafe threadsafety, template <typename> class limit_type, allow_repetitions repetitions, typename enable_if<is_enum<T>::value, int>::type = 0>
 void range_copy_helper(attribute<T, threadsafety, limit_type, repetitions>* attr)
@@ -265,12 +304,16 @@ void range_copy_helper(attribute<T, threadsafety, limit_type, repetitions>* attr
     }
 }
 
+// atoms attrs don't use range
+template <typename T, threadsafe threadsafety, template <typename> class limit_type, allow_repetitions repetitions, typename enable_if<is_same<T, atoms>::value, int>::type = 0>
+void range_copy_helper(attribute<T, threadsafety, limit_type, repetitions>* attr) {}
+
 // color attrs don't use range
 template <typename T, threadsafe threadsafety, template <typename> class limit_type, allow_repetitions repetitions, typename enable_if<is_color<T>::value, int>::type = 0>
 void range_copy_helper(attribute<T, threadsafety, limit_type, repetitions>* attr) {}
 
 // most attrs can just copy range normally
-template <typename T, threadsafe threadsafety, template <typename> class limit_type, allow_repetitions repetitions, typename enable_if<!is_enum<T>::value && !is_color<T>::value, int>::type = 0>
+template <typename T, threadsafe threadsafety, template <typename> class limit_type, allow_repetitions repetitions, typename enable_if<!is_enum<T>::value && !is_same<T, atoms>::value && !is_color<T>::value, int>::type = 0>
 void range_copy_helper(attribute<T, threadsafety, limit_type, repetitions>* attr)
 {
     for (const auto& a : attr->get_range_args()) {
@@ -348,6 +391,20 @@ bool attribute<ints>::compare_to_current_value(const atoms& args) const
     if (args.size() == m_value.size()) {
         for (auto i = 0; i < m_value.size(); ++i) {
             if (!equivalent<int>(args[i], m_value[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+template <>
+bool attribute<atoms>::compare_to_current_value(const atoms& args) const
+{
+    if (args.size() == m_value.size()) {
+        for (auto i = 0; i < m_value.size(); ++i) {
+            if (!(args[i] == m_value[i])) {
                 return false;
             }
         }

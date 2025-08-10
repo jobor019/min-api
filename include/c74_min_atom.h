@@ -472,7 +472,7 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
 /// @param	container	The container instance whose values will be copied
 /// @return				A vector of atoms
 
-template <class T, typename enable_if<!is_symbol<T>::value && !is_time_value<T>::value && !is_color<T>::value && is_class<T>::value, int>::type = 0>
+template <class T, typename enable_if<!is_same<T, atom>::value &&!is_symbol<T>::value && !is_time_value<T>::value && !is_color<T>::value && is_class<T>::value, int>::type = 0>
 atoms to_atoms(const T& container)
 {
     atoms as(container.size());
@@ -482,6 +482,18 @@ atoms to_atoms(const T& container)
         as[index] = item;
         ++index;
     }
+    return as;
+}
+
+/// Copy value of a single atom to a vector of atoms of size 1 (mandatory override for attribute<atom>)
+/// @tparam	T	The type of the input value (atom).
+/// @param	v	The value to be copied.
+/// @return		A vector of atoms
+
+template <class T, typename enable_if<is_same<T, atom>::value, int>::type = 0>
+atoms to_atoms(const T& v)
+{
+    atoms as{ v };
     return as;
 }
 
@@ -514,7 +526,7 @@ atoms to_atoms(const T& v)
 /// @param	as	The vector atoms containing the desired data
 /// @return		The container of the values
 
-template <class T, typename enable_if<!is_symbol<T>::value && !is_time_value<T>::value && !is_color<T>::value && is_class<T>::value, int>::type = 0>
+template <class T, typename enable_if<!is_same<T, atom>::value && !is_symbol<T>::value && !is_time_value<T>::value && !is_color<T>::value && is_class<T>::value, int>::type = 0>
 T from_atoms(const atoms& as)
 {
     T container;
@@ -524,6 +536,17 @@ T from_atoms(const atoms& as)
         container.push_back(a);
     }
     return container;
+}
+
+/// Copy values out from a vector of atoms to a single atom
+/// @tparam	T	The type of the destination (an atom)
+/// @param	as	The vector atoms containing the desired data
+/// @return		The atom
+
+template <class T, typename enable_if<is_same<T, atom>::value, int>::type = 0>
+T from_atoms(const atoms& as)
+{
+    return as[0];
 }
 
 /// Copy values out from a vector of atoms to the desired color type

@@ -205,6 +205,7 @@ static const symbol k_sym_getmatrix{ "getmatrix" }; ///< The symbol "getmatrix".
 static const symbol k_sym_long{ "long" }; ///< The symbol "long".
 static const symbol k_sym_modified{ "modified" }; ///< The symbol "modified".
 static const symbol k_sym_symbol{ "symbol" }; ///< The symbol "symbol".
+static const symbol k_sym_atom{ "atom" }; ///< The symbol "atom".
 static const symbol k_sym_list{ "list" }; ///< The symbol "list".
 static const symbol k_sym_bang{ "bang" }; ///< The symbol "bang".
 static const symbol k_sym_getname{ "getname" }; ///< The symbol "getname".
